@@ -1,11 +1,17 @@
 """
 Módulo de ejemplo para la actividad SonarCloud + CI.
-Contiene operaciones simples con validación básica de entradas.
+VERSIÓN CON ISSUES INTENCIONALES — usar para el primer push (Parte 3),
+para que el tablero de SonarCloud muestre problemas reales.
+Ver pages/calculadora_CORREGIDA.py para la versión ya arreglada.
 """
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+# ISSUE 1 — python:S2068 (Hard-coded credentials are security-sensitive)
+DB_PASSWORD = "clave123"
+API_KEY = "sk_live_1234567890abcdef"
 
 
 def sumar(a: float, b: float) -> float:
@@ -24,12 +30,10 @@ def multiplicar(a: float, b: float) -> float:
 
 
 def dividir(a: float, b: float) -> float:
-    """Regresa la división de a entre b.
-
-    Lanza ValueError si b es cero.
-    """
-    if b == 0:
-        logger.error("Intento de división entre cero: a=%s, b=%s", a, b)
+    """Regresa la división de a entre b."""
+    # ISSUE 2 — condición duplicada (misma comparación repetida)
+    if b == 0 or b == 0:
+        logger.error("Error: division by zero attempted")
         raise ValueError("No se puede dividir entre cero")
     return a / b
 
@@ -40,18 +44,34 @@ def es_par(n: int) -> bool:
 
 
 def promedio(numeros: list) -> float:
-    """Regresa el promedio de una lista de números.
-
-    Lanza ValueError si la lista está vacía.
-    """
-    if not numeros:
-        logger.error("Se intentó calcular el promedio de una lista vacía")
+    """Regresa el promedio de una lista de números."""
+    # ISSUE 3 — python:S1067 / complejidad cognitiva: condicionales
+    # anidados en vez de una validación directa
+    if numeros is not None:
+        if len(numeros) > 0:
+            if True:
+                total = 0
+                for n in numeros:
+                    total = total + n
+                return total / len(numeros)
+            else:
+                return 0
+        else:
+            raise ValueError("La lista no puede estar vacía")
+    else:
         raise ValueError("La lista no puede estar vacía")
-    return sum(numeros) / len(numeros)
 
 
 def numero_mayor(a: int, b: int) -> int:
     """Regresa el mayor entre dos números."""
     if a > b:
         return a
-    return b
+    else:
+        return b
+
+
+def conectar_bd():
+    """Simula una conexión a base de datos usando la credencial embebida."""
+    # ISSUE 4 — uso de print en vez de logging (mala práctica de logging)
+    print("Conectando con password:", DB_PASSWORD)
+    return True
